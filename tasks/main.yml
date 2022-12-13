@@ -1,0 +1,36 @@
+---
+- name: Yum install epel-release
+  yum:
+    name: epel-release
+    state: present
+  when: ansible_facts["distribution"] == "CentOS"
+
+- name: Yum install nginx
+  yum:
+    name: nginx
+    state: present
+  when: ansible_facts["distribution"] == "CentOS"
+
+- name: Apt install nginx
+  apt:
+    name: nginx
+    state: present
+  when: ansible_facts["distribution"] == "Ubuntu"
+    
+- name: Start nginx
+  service:
+    name: nginx
+    state: started
+
+- name: Stop firewalld
+  systemd:
+    name: firewalld
+    state: stopped
+  when: ansible_facts["distribution"] == "CentOS"
+
+- name: Replace nginx config
+  template:
+    src: templates/nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+  notify:
+  - Restart nginx
